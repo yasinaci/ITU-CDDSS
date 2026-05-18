@@ -9,11 +9,6 @@ import { ErrorState, PageSkeleton } from "@/components/ui/loading";
 type FavouriteVenueRow = {
   favorite_id: number;
   venue_id: number;
-  venue?: {
-    venue_id: number;
-    venue_name: string;
-    venue_type: string;
-  } | null;
 };
 
 export default function FavouritesPage() {
@@ -46,7 +41,7 @@ export default function FavouritesPage() {
 
     const { data: favourites, error: favouriteError } = await supabase
       .from("user_favorite_venue")
-      .select("favorite_id, venue_id, venue(venue_id,venue_name,venue_type)")
+      .select("favorite_id, venue_id")
       .eq("user_id", currentProfile.user_id);
 
     if (favouriteError) {
@@ -55,7 +50,8 @@ export default function FavouritesPage() {
       return;
     }
 
-    const ids = ((favourites as FavouriteVenueRow[]) ?? []).map((item) => item.venue_id);
+    const favouriteRows = (favourites ?? []) as FavouriteVenueRow[];
+    const ids = favouriteRows.map((item) => item.venue_id);
     if (!ids.length) {
       setVenues([]);
       setLoading(false);
